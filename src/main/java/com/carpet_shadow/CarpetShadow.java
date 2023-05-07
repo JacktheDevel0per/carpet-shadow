@@ -2,6 +2,7 @@ package com.carpet_shadow;
 
 import carpet.CarpetExtension;
 import carpet.CarpetServer;
+import carpet.settings.SettingsManager;
 import com.carpet_shadow.utility.RandomString;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,13 +21,15 @@ public class CarpetShadow implements CarpetExtension, ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger("carpet-shadow");
     public static RandomString shadow_id_generator = new RandomString(CarpetShadowSettings.shadowItemIdSize);
 
+    public static SettingsManager settingsManager = new SettingsManager("0.0.1","carpet-shadow","Carpet Shadow");
+
     @Override
     public void onGameStarted() {
         CarpetShadow.LOGGER.info("Carpet Shadow Loaded!");
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER){
-            CarpetServer.settingsManager.parseSettingsClass(CarpetShadowServerSettings.class);
+            settingsManager.parseSettingsClass(CarpetShadowServerSettings.class);
         }
-        CarpetServer.settingsManager.parseSettingsClass(CarpetShadowSettings.class);
+        settingsManager.parseSettingsClass(CarpetShadowSettings.class);
         shadow_id_generator = new RandomString(CarpetShadowSettings.shadowItemIdSize);
     }
 
@@ -34,8 +37,12 @@ public class CarpetShadow implements CarpetExtension, ModInitializer {
     public void onInitialize() {
         CarpetServer.manageExtension(new CarpetShadow());
         CarpetShadow.LOGGER.info("Carpet Shadow Loading!");
-        ServerLifecycleEvents.SERVER_STOPPED.register((server -> {
-            shadowMap.clear();
-        }));
+        ServerLifecycleEvents.SERVER_STOPPED.register((server -> shadowMap.clear()));
+    }
+
+
+    @Override
+    public SettingsManager customSettingsManager() {
+        return settingsManager;
     }
 }

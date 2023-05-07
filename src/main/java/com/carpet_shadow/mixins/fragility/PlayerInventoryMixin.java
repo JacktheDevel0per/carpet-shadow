@@ -24,18 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
 
-    @Shadow
-    @Final
-    public PlayerEntity player;
-    @Shadow
-    @Final
-    public DefaultedList<ItemStack> main;
-
-    @Shadow
-    protected abstract int addStack(ItemStack stack);
-
-    @Shadow
-    public abstract int getEmptySlot();
 
     @Shadow
     public abstract void setStack(int slot, ItemStack stack);

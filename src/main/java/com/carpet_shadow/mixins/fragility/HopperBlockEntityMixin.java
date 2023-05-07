@@ -41,7 +41,7 @@ public abstract class HopperBlockEntityMixin {
 
     @Redirect(method = "insert",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"))
-    private static ItemStack insert_fix_storage1(ItemStack instance) {
+    private ItemStack insert_fix_storage1(ItemStack instance) {
         if (CarpetShadowSettings.shadowItemTransferFragilityFix && ((ShadowItem) (Object) instance).getShadowId() != null) {
             return instance;
         }
@@ -49,12 +49,12 @@ public abstract class HopperBlockEntityMixin {
     }
 
     @Redirect(method = "insert",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/Inventory;setStack(ILnet/minecraft/item/ItemStack;)V"))
-    private static void insert_fix_storage2(Inventory instance, int i, ItemStack itemStack) {
-        if (CarpetShadowSettings.shadowItemTransferFragilityFix && ((ShadowItem) (Object) itemStack).getShadowId() != null) {
-            itemStack.setCount(itemStack.getCount() + 1);
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/HopperBlockEntity;setStack(ILnet/minecraft/item/ItemStack;)V"))
+    private void insert_fix_storage2(HopperBlockEntity instance, int slot, ItemStack stack) {
+        if (CarpetShadowSettings.shadowItemTransferFragilityFix && ((ShadowItem) (Object) stack).getShadowId() != null) {
+            stack.setCount(stack.getCount() + 1);
         }
-        instance.setStack(i, itemStack);
+        instance.setStack(slot, stack);
     }
 
 }

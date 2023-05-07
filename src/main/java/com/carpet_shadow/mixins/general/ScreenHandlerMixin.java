@@ -4,7 +4,6 @@ import com.carpet_shadow.CarpetShadow;
 import com.carpet_shadow.CarpetShadowSettings;
 import com.carpet_shadow.Globals;
 import com.carpet_shadow.interfaces.ShadowItem;
-import com.carpet_shadow.utility.ShadowingException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -22,31 +21,35 @@ import java.lang.ref.WeakReference;
 @Mixin(ScreenHandler.class)
 public abstract class ScreenHandlerMixin {
 
-    @Shadow
-    protected abstract void internalOnSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player);
-
     @Shadow public abstract Slot getSlot(int index);
 
-    @Shadow public abstract ItemStack getCursorStack();
+
+    @Shadow protected abstract ItemStack method_30010(int i, int j, SlotActionType slotActionType, PlayerEntity playerEntity);
 
     @Redirect(method = "onSlotClick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;internalOnSlotClick(IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V"),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;method_30010(IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;"),
             require = 0)
-    private void handle_shadowing(ScreenHandler instance, int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+    private ItemStack handle_shadowing(ScreenHandler instance, int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+
         try {
-            internalOnSlotClick(slotIndex, button, actionType, player);
+            return method_30010(slotIndex, button, actionType, player);
         } catch (Throwable error) {
-            if(actionType!=SlotActionType.SWAP && actionType!=SlotActionType.PICKUP && actionType!=SlotActionType.QUICK_CRAFT)
+            if(actionType!=SlotActionType.SWAP && actionType!=SlotActionType.PICKUP && actionType!=SlotActionType.QUICK_CRAFT) {
                 throw error;
 
+            }
+
+
+
             ItemStack stack1 = this.getSlot(slotIndex).getStack();
-            ItemStack stack2 = player.getInventory().getStack(button);
-            ItemStack stack3 = this.getCursorStack();
+            ItemStack stack2 = player.inventory.getStack(button);
+            ItemStack stack3 = player.inventory.getCursorStack();
             ItemStack shadow = null;
             if(stack1 == stack2 || stack1 == stack3)
                 shadow = stack1;
             else if (stack2 == stack3)
                 shadow = stack2;
+
 
             if(shadow != null){
                 CarpetShadow.LOGGER.warn("New Shadow Item Created");
@@ -58,7 +61,9 @@ public abstract class ScreenHandlerMixin {
                     throw error;
                 }
             }
-        }
-    }
 
+            return stack1;
+        }
+        //return ItemStack.EMPTY;
+    }
 }

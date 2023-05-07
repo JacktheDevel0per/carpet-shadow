@@ -23,10 +23,10 @@
     "carpet-shadow.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.7",
-    "fabric": ">=0.11.0",
-    "carpet": ">=1.4.52",
-    "minecraft": "1.17.x"
+    "fabricloader": "*",
+    "fabric": "*",
+    "carpet": "*",
+    "minecraft": "1.16.x"
   },
   "custom": {
     "modmenu": {

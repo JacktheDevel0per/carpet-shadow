@@ -5,6 +5,7 @@ import com.carpet_shadow.Globals;
 import com.carpet_shadow.interfaces.ShadowItem;
 import com.carpet_shadow.interfaces.ShifingItem;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -23,15 +24,13 @@ public abstract class ScreenHandlerMixin {
         return false;
     }
 
-    @Shadow
-    public abstract ItemStack getCursorStack();
 
-    @Redirect(method = "internalOnSlotClick", slice = @Slice(
+    @Redirect(method = "method_30010", slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canTakeItems(Lnet/minecraft/entity/player/PlayerEntity;)Z", ordinal = 1)),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;setCursorStack(Lnet/minecraft/item/ItemStack;)V", ordinal = 1)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;setCursorStack(Lnet/minecraft/item/ItemStack;)V", ordinal = 1)
     )
-    public void remove_shadow_stack(ScreenHandler instance, ItemStack stack) {
-        String shadowId1 = ((ShadowItem) (Object) getCursorStack()).getShadowId();
+    public void remove_shadow_stack(PlayerInventory instance, ItemStack stack) {
+        String shadowId1 = ((ShadowItem) (Object) instance.getCursorStack()).getShadowId();
         String shadowId2 = ((ShadowItem) (Object) stack).getShadowId();
         if (CarpetShadowSettings.shadowItemInventoryFragilityFix && shadowId1 != null && shadowId1.equals(shadowId2)) {
             instance.setCursorStack(ItemStack.EMPTY);
@@ -40,7 +39,7 @@ public abstract class ScreenHandlerMixin {
         }
     }
 
-    @Redirect(method = "internalOnSlotClick", slice = @Slice(
+    @Redirect(method = "method_30010", slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canTakeItems(Lnet/minecraft/entity/player/PlayerEntity;)Z")
     ),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;transferSlot(Lnet/minecraft/entity/player/PlayerEntity;I)Lnet/minecraft/item/ItemStack;"))
@@ -92,9 +91,9 @@ public abstract class ScreenHandlerMixin {
         return instance.isEmpty();
     }
 
-    @Redirect(method = "internalOnSlotClick",
+    @Redirect(method = "method_30010",
             slice = @Slice(
-                    from = @At(value = "INVOKE",target = "Lnet/minecraft/util/collection/DefaultedList;get(I)Ljava/lang/Object;"),
+                    from = @At(value = "INVOKE",target = "Ljava/util/List;get(I)Ljava/lang/Object;"),
                     to = @At(value = "INVOKE",target = "Ljava/util/Set;add(Ljava/lang/Object;)Z")
             ),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;canInsertItemIntoSlot(Lnet/minecraft/screen/slot/Slot;Lnet/minecraft/item/ItemStack;Z)Z"))

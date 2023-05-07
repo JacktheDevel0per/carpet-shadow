@@ -25,10 +25,14 @@ import java.util.Objects;
 @Mixin(PacketByteBuf.class)
 public abstract class PacketByteBufMixin {
 
-    @Redirect(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getNbt()Lnet/minecraft/nbt/NbtCompound;"))
+    private static final String DISPLAY_KEY = "display";
+    private static final String LORE_KEY = "Lore";
+
+
+    @Redirect(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTag()Lnet/minecraft/nbt/NbtCompound;"))
     @Environment(EnvType.SERVER)
     public NbtCompound add_shadow_lore(ItemStack instance) {
-        NbtCompound ret = instance.getNbt();
+        NbtCompound ret = instance.getTag();
         NbtCompound display = new NbtCompound();
         if (CarpetShadowSettings.shadowItemTooltip && ((ShadowItem) (Object) instance).getShadowId() != null) {
             LiteralText text = new LiteralText("shadow_id: ");
@@ -37,15 +41,15 @@ public abstract class PacketByteBufMixin {
             NbtList list = new NbtList();
             if (ret == null) {
                 ret = new NbtCompound();
-            } else if (ret.contains(ItemStack.DISPLAY_KEY)) {
-                display = ret.getCompound(ItemStack.DISPLAY_KEY);
-                if (display.contains(ItemStack.LORE_KEY)) {
-                    list = ret.getList(ItemStack.LORE_KEY, 8);
+            } else if (ret.contains(DISPLAY_KEY)) {
+                display = ret.getCompound(DISPLAY_KEY);
+                if (display.contains(LORE_KEY)) {
+                    list = ret.getList(LORE_KEY, 8);
                 }
             }
             list.add(NbtString.of(Text.Serializer.toJson(text)));
-            display.put(ItemStack.LORE_KEY, list);
-            ret.put(ItemStack.DISPLAY_KEY, display);
+            display.put(LORE_KEY, list);
+            ret.put(DISPLAY_KEY, display);
             ret.putString(ShadowItem.SHADOW_KEY,((ShadowItem) (Object) instance).getShadowId());
         }
         return ret;
@@ -56,15 +60,15 @@ public abstract class PacketByteBufMixin {
         ItemStack stack = cir.getReturnValue();
         String string;
         MutableText mutableText2;
-        NbtCompound nbt = stack.getNbt();
-        if (nbt != null && nbt.contains(ItemStack.DISPLAY_KEY)) {
+        NbtCompound nbt = stack.getTag();
+        if (nbt != null && nbt.contains(DISPLAY_KEY)) {
             String shadow_id = nbt.getString(ShadowItem.SHADOW_KEY);
             if (!shadow_id.equals("")){
                 ((ShadowItem) (Object) stack).setShadowId(shadow_id);
             }
-            NbtCompound display = nbt.getCompound(ItemStack.DISPLAY_KEY);
-            if (display.contains(ItemStack.LORE_KEY)) {
-                NbtList lore = display.getList(ItemStack.LORE_KEY, 8);
+            NbtCompound display = nbt.getCompound(DISPLAY_KEY);
+            if (display.contains(LORE_KEY)) {
+                NbtList lore = display.getList(LORE_KEY, 8);
                 for (int i = 0; i < lore.size(); ++i) {
                     string = lore.getString(i);
                     try {
@@ -79,11 +83,11 @@ public abstract class PacketByteBufMixin {
                     }
                 }
                 if (lore.isEmpty())
-                    display.remove(ItemStack.LORE_KEY);
+                    display.remove(LORE_KEY);
                 if (display.isEmpty())
-                    nbt.remove(ItemStack.DISPLAY_KEY);
+                    nbt.remove(DISPLAY_KEY);
                 if (nbt.isEmpty())
-                    stack.setNbt(null);
+                    stack.setTag(null);
             }
         }
 

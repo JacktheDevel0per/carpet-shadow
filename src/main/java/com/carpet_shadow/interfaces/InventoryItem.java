@@ -1,10 +1,12 @@
 package com.carpet_shadow.interfaces;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
 import java.util.Collection;
+
 
 public interface InventoryItem {
 
@@ -14,7 +16,7 @@ public interface InventoryItem {
 
     void removeSlot(Inventory inventory, int slot);
 
-    static void readNbt(BlockEntity instance, NbtCompound nbt) {
+    static void fromTag(BlockEntity instance, BlockState state, NbtCompound nbt) {
         if (instance instanceof Inventory inv) {
             try {
                 for (int index = 0; index < inv.size(); index++) {
@@ -25,7 +27,7 @@ public interface InventoryItem {
                 }
             }catch (Exception ignored){}
 
-            instance.readNbt(nbt);
+            instance.fromTag(state,nbt);
 
             try {
                 for (int index = 0; index < inv.size(); index++) {
@@ -36,7 +38,7 @@ public interface InventoryItem {
                 }
             }catch (Exception ignored){}
         } else {
-            instance.readNbt(nbt);
+            instance.fromTag(instance.getCachedState(),nbt);
         }
     }
 }

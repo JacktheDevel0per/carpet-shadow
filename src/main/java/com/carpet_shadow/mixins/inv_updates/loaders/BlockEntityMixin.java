@@ -19,8 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BlockEntity.class)
 public abstract class BlockEntityMixin {
 
-    @Inject(method = "createFromNbt",at=@At("RETURN"))
-    private static void interceptBlockEntityLoad(BlockPos pos, BlockState state, NbtCompound nbt, CallbackInfoReturnable<BlockEntity> cir){
+    @Inject(method = "createFromTag",at=@At("RETURN"))
+    private static void interceptBlockEntityLoad(BlockState state, NbtCompound tag, CallbackInfoReturnable<BlockEntity> cir){
         if(cir.getReturnValue() instanceof Inventory inv){
             try {
                 for (int index = 0; index < inv.size(); index++) {

@@ -20,7 +20,7 @@ public class LootTableMixin {
                     itemStack.getCount() == itemStack.getMaxCount()) {
                 lootConsumer.accept(itemStack);
             } else
-            consumer.accept(itemStack);
+                consumer.accept(itemStack);
         };
         cir.setReturnValue(ret);
     }

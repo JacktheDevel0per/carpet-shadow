@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Slot.class)
 public abstract class SlotMixin {
 
+
+
     @Shadow
     public abstract void setStack(ItemStack stack);
 
@@ -41,4 +43,6 @@ public abstract class SlotMixin {
             cir.setReturnValue(ret);
         }
     }
+
+
 }

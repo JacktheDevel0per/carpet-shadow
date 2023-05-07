@@ -18,18 +18,17 @@ public abstract class SlotMixin {
     @Shadow public abstract ItemStack getStack();
 
     @Shadow @Final public Inventory inventory;
-
-    @Shadow public abstract int getIndex();
+    @Shadow @Final private int index;
 
     @Inject(method = "setStack",
             at = @At(value = "HEAD"))
     public void remember_inventory(ItemStack next, CallbackInfo ci) {
             ItemStack curr = getStack();
             if(((ShadowItem)(Object)curr).getShadowId() != null){
-                ((InventoryItem)(Object)curr).removeSlot(this.inventory, getIndex());
+                ((InventoryItem)(Object)curr).removeSlot(this.inventory, this.index);
             }
             if(((ShadowItem)(Object)next).getShadowId() != null){
-                ((InventoryItem)(Object)next).addSlot(this.inventory, getIndex());
+                ((InventoryItem)(Object)next).addSlot(this.inventory, this.index);
             }
     }
 }
