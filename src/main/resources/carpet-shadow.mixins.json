@@ -27,7 +27,6 @@
     "inv_updates.loaders.StructureMixin",
     "persistence.ItemStackMixin",
     "tooltip.InventoryS2CPacketMixin",
-    "tooltip.ItemStackMixin",
     "tooltip.PacketByteBufMixin",
     "tooltip.ScreenHandlerMixin",
     "tooltip.ScreenHandlerSlotUpdateS2CPacketMixin"

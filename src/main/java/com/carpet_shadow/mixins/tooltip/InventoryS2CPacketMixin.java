@@ -3,6 +3,8 @@ package com.carpet_shadow.mixins.tooltip;
 import com.carpet_shadow.CarpetShadow;
 import com.carpet_shadow.CarpetShadowSettings;
 import com.carpet_shadow.interfaces.ShadowItem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -26,8 +28,11 @@ public abstract class InventoryS2CPacketMixin {
 
 
 
+
         ItemStack stackCopy = CarpetShadowSettings.shadowItemTooltip ? ShadowItem.copy_redirect(instance) : instance.copy();
 
+        //Fix Buggy Client Stuff - wish it was by world...
+        if(FabricLoader.getInstance().getEnvironmentType().equals(EnvType.CLIENT)) return stackCopy;
 
 
 

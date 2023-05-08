@@ -9,12 +9,16 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ScreenHandler.class)
 public abstract class ScreenHandlerMixin {
@@ -107,5 +111,44 @@ public abstract class ScreenHandlerMixin {
         }
         return canInsertItemIntoSlot(slot, stack, allowOverflow);
     }
+
+
+    @Inject(method = "method_30010",at=@At(value = "INVOKE",target = "Lnet/minecraft/item/ItemStack;decrement(I)V"),locals = LocalCapture.CAPTURE_FAILEXCEPTION,cancellable = true)
+    private void stopreInit(int i, int j, SlotActionType slotActionType, PlayerEntity playerEntity, CallbackInfoReturnable<ItemStack> cir, ItemStack itemStack, PlayerInventory playerInventory, Slot slot3, ItemStack itemStack3, ItemStack itemStack2, int o) {
+
+
+        if (!CarpetShadowSettings.shadowItemInventoryFragilityFix) return;
+
+
+
+        if (itemStack2.getCount() == o) {
+            itemStack3 = itemStack2;
+
+            itemStack2 = ItemStack.EMPTY;
+            cir.cancel();
+
+            slot3.markDirty();
+        }
+
+    }
+
+
+    @Redirect(method = "method_30010",at=@At(value = "INVOKE",target = "Lnet/minecraft/screen/slot/Slot;takeStack(I)Lnet/minecraft/item/ItemStack;"))
+    public ItemStack takeNoCopy(Slot instance, int amount) {
+        if (!CarpetShadowSettings.shadowItemInventoryFragilityFix) return instance.takeStack(amount);
+
+        ItemStack currentStack = instance.getStack();
+
+
+        if (amount == currentStack.getCount()) {
+            instance.setStack(ItemStack.EMPTY);
+            return currentStack;
+        }
+
+
+        return instance.takeStack(amount);
+    }
+
+
 
 }
