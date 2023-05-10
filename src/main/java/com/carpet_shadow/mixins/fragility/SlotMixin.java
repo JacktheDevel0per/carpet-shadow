@@ -62,6 +62,8 @@ public abstract class SlotMixin {
      Works for Picking up stacks Only!
 
 
+     Somehow this works rather than just in the method...
+
 
      **/
     @Inject(method = "takeStack",at=@At("HEAD"),cancellable = true)

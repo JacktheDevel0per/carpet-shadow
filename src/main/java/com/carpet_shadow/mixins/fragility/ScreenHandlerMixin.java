@@ -113,6 +113,18 @@ public abstract class ScreenHandlerMixin {
     }
 
 
+
+
+
+
+    /**
+    * BROKEN
+     * Stack place back (click an empty slot)
+     * @reason fix fragility issues having to do with Minecraft creating new ItemStacks (copies) when transferring items even if it is grabbing a full stack.
+     */
+
+
+
     @Inject(method = "method_30010",at=@At(value = "INVOKE",target = "Lnet/minecraft/item/ItemStack;decrement(I)V"),locals = LocalCapture.CAPTURE_FAILEXCEPTION,cancellable = true)
     private void stopreInit(int i, int j, SlotActionType slotActionType, PlayerEntity playerEntity, CallbackInfoReturnable<ItemStack> cir, ItemStack itemStack, PlayerInventory playerInventory, Slot slot3, ItemStack itemStack3, ItemStack itemStack2, int o) {
 
@@ -132,6 +144,12 @@ public abstract class ScreenHandlerMixin {
 
     }
 
+
+/**
+     *
+     * Stack Pickup
+     * @reason fix fragility issues having to do with Minecraft creating new ItemStacks (copies) when transferring items even if it is grabbing a full stack.
+     */
 
     @Redirect(method = "method_30010",at=@At(value = "INVOKE",target = "Lnet/minecraft/screen/slot/Slot;takeStack(I)Lnet/minecraft/item/ItemStack;"))
     public ItemStack takeNoCopy(Slot instance, int amount) {
